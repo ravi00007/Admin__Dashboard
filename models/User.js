@@ -14,11 +14,16 @@ const UserSchema = new mongoose.Schema({
         type:String,
         requied : true
     },
-    image: 
-    { 
-        data: Buffer, 
-        contentType: String 
-    }
+    image: {
+		type: String,
+		required: true,
+	},
+
+    // image: 
+    // { 
+    //     data: Buffer, 
+    //     contentType: String 
+    // }
 
    
 })

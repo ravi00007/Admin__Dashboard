@@ -53,8 +53,8 @@ app.get('/creat',(req,res)=>{
 });  
 app.get('/edit',(req,res)=>{
     res.render('edit')
-}); 
-
+});
+  
 app.get('/delete/:id',(req,res)=>{
     User.findByIdAndDelete(req.params.id,(err,result)=>{
         if(err) throw console.log(err)
@@ -65,6 +65,7 @@ app.get('/delete/:id',(req,res)=>{
         }
     })
 });
+
 
 app.post('/update',upload.single('image'),(req,res)=>{
 const name= req.body.name;
@@ -98,6 +99,8 @@ app.get('/alldetails',(req,res)=>{
         console.log(err)
       }else{
         res.render('all',{details:details})
+        // .json(details)
+        console.log(details)
       }
     })
   })
@@ -107,10 +110,11 @@ app.post('/create',upload.single('image'), (req, res, next)=>{
         name: req.body.name, 
         price: req.body.price, 
         brand : req.body.brand,
-        image: { 
-            data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)), 
-            contentType: 'image/png'
-        }  
+        image : req.body.image
+        // image: { 
+        //     data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)), 
+        //     contentType: 'image/png'
+        // }  
     }
     User.create(obj, (err, item) => { 
         if (err) { 
@@ -147,6 +151,19 @@ app.post('/login',(req,res)=>{
    
 })
 
+
+app.get('/api/alldetails',(req,res)=>{
+    User.find({},(err,details)=>{
+      if(err){
+        console.log(err)
+      }else{
+          res.status(200).json(details);
+        // res.render('all',{details:details})
+        // // .json(details)
+        // console.log(details)
+      }
+    })
+  })
 
 
 const PORT =process.env.PORT || 7000;
