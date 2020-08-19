@@ -40,7 +40,7 @@ app.get('/login',(req,res)=>{
     res.render('login')              
 });
 app.get('/',(req,res)=>{
-    res.send('to view try=> /dashbord')
+    res.render('login') 
 })
 app.get('/dashbord',(req,res)=>{
     res.render("index"); 
@@ -125,6 +125,27 @@ app.post('/create',upload.single('image'), (req, res, next)=>{
     console.log(obj)
 })
 
+app.post('/login',(req,res)=>{
+    let email = req.body.email;
+    let pass = req.body.pass;
+    console.log(email);
+    console.log(pass);
+    
+    let e ="admin@gmail.com";
+    let p ="Admin@123456";
+    if(email==e){
+        if(pass===p){
+          res.render('index');
+        }else{
+            res.send("wrong password");
+        }
+    }else{
+        res.send("invalid Email");
+    }
+    
+    
+   
+})
 
 
 
