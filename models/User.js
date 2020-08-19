@@ -2,6 +2,13 @@
  
 
 const UserSchema = new mongoose.Schema({
+    title: {
+		type: String,
+		required: true,
+    },
+    description: {
+		type: String,
+	},
     name:{
         type:String,
         requied : true
@@ -17,6 +24,10 @@ const UserSchema = new mongoose.Schema({
     image: {
 		type: String,
 		required: true,
+    },
+    favorite: {
+		type: Boolean,
+		default: false,
 	},
 
     // image: 

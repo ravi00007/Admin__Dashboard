@@ -111,7 +111,9 @@ app.post('/create',upload.single('image'), (req, res, next)=>{
         name: req.body.name, 
         price: req.body.price, 
         brand : req.body.brand,
-        image : req.body.image
+        image : req.body.image,
+        title :req.body.title,
+        description:req.body.description,
         // image: { 
         //     data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)), 
         //     contentType: 'image/png'
