@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const User = require('./models/User');
 const path = require('path');
 const multer = require('multer');
+const cors = require('cors');
 var fs = require('fs'); 
 const { throws } = require('assert');
 mongoose.connect('mongodb+srv://cron:9304@ravi@cluster0.zl5bd.mongodb.net/cron?retryWrites=true&w=majority', {useNewUrlParser:true,useUnifiedTopology: true },(err)=>{
@@ -15,7 +16,7 @@ mongoose.connect('mongodb+srv://cron:9304@ravi@cluster0.zl5bd.mongodb.net/cron?r
     }
 })
 const app = express();
-
+app.use(cors());
 const storage = multer.diskStorage({
     destination:function(req,file,cb){
         cb(null,"uploads")
