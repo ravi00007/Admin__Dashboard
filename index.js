@@ -41,7 +41,7 @@ app.set('view engine','ejs');
 app.get('/login',(req,res)=>{
     res.render('login')              
 });
-app.get('/',(req,res)=>{
+app.get('/admin',(req,res)=>{
     res.render('login') 
 })
 app.get('/dashbord',(req,res)=>{
@@ -184,7 +184,7 @@ app.get('/api/alldetails',(req,res)=>{
 
 
 // Post request which will handle db of Fav list
-app.post("api/:id", async (req, res) => {
+app.post("/:id", async (req, res) => {
 	// res.send("working");
 
 	try {
@@ -239,7 +239,7 @@ app.post("api/:id", async (req, res) => {
 });
 
 // Get all the fav items
-app.get("api/", async (req, res) => {
+app.get("/", async (req, res) => {
 	try {
 		const favItems = await Favorite.find({});
 		res.status(200).json(favItems);
@@ -248,7 +248,7 @@ app.get("api/", async (req, res) => {
 	}
 });
 //Get a single Fav item
-app.get("api/:id", async (req, res) => {
+app.get("/:id", async (req, res) => {
 	try {
 		const favItems = await Favorite.findById(req.params.id);
 		res.status(200).json(favItems);
@@ -258,7 +258,7 @@ app.get("api/:id", async (req, res) => {
 });
 
 //Delete a fav item
-app.delete("api/:id/:objId", async (req, res) => {
+app.delete("/:id/:objId", async (req, res) => {
 	try {
 		const item = await Favorite.findByIdAndDelete(req.params.id, {
 			useFindAndModify: true,
