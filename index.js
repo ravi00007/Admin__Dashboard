@@ -168,17 +168,17 @@ app.get('/api/alldetails',(req,res)=>{
     }) 
   })
 
-  app.get('/edit/:id',(req,res)=>{
-    User.find({},(err,details)=>{
-        if(err){
-          console.log(err)
-        }else{
-          res.render('edit',{details:details})
-          // .json(details)
-          console.log(details)
-        }
-      })  
-  })
+//   app.get('/:id',(req,res)=>{
+//     User.find({"_id":req.params.id},(err,details)=>{
+//         if(err){
+//           console.log(err)
+//         }else{ 
+//           res.render('edit',{details:details})
+//           // .json(details)
+//           console.log(details)
+//         }
+//       })  
+//   })
 
 
 

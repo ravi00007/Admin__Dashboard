@@ -248,7 +248,7 @@
                 <td><%= item.brand %></td>
                 <td><img src="<%= item.image %>" style="width: 45px; height: 35px;"></td>
                 <td><p><a href="delete/<%= item.id %>" class="btn btn-danger" onclick="return confirm('Are you sure want to Delete');" role="button">Delete</a></p></td>
-                <td><p><a href="/edit/<%= item.name%>" class="btn btn-warning"  role="button">Edit</a></p></td>
+                <td><p><a href="/<%= item.id %>" class="btn btn-warning"  role="button">Edit</a></p></td>
               </tr>
             </tbody>
             <% }) %>
