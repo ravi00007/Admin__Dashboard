@@ -231,60 +231,72 @@
                 <h1 class="text-center mb-3">
                   <i class="fas fa-user-plus"></i> Edit PRODUCT
                 </h1>
-                
+                <% if(details!=null) { %>
+                  <table  class="table table-bordered">
+                      <thead>
+                        <tr>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% details.forEach(function(item){ %>
+                        <tr>
+                          
+                        </tr>
+                      </tbody>
+                      <% }) %>
+                    </table>
+                    <% } %>
+                  <% details.forEach(function(item){ %>
                 <form action="/update" method="POST" enctype="multipart/form-data">
+                
                   <div class="form-group">
-                    <label for="name">Existing Product Name</label>
-                    <input
-                      type="name"
-                      id="name"
-                      name="name"
-                      class="form-control"
-                      placeholder="Enter Product Name"
-                      value="<%= details.name %>"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <label for="name">New Product Name</label>
+                    <label for="name"> Product Name</label>
                     <input
                       type="newname"
                       id="name"
                       name="name"
                       class="form-control"
                       placeholder="Enter New Product Name"
-                      value="<%= typeof name != 'undefined' ? name : '' %>"
+                      value="<%= item.name %>"
                     />
                   </div>
                   <div class="form-group">
-                    <label for="email">New Product Price</label>
+                    <label for="price"> Product Price</label>
                     <input
                       type="text"
                       id="email"
                       name="price"
                       class="form-control"
                       placeholder="Enter New Product Price"
-                      value="<%= typeof email != 'undefined' ? email : '' %>"
+                      value="<%= item.price %>"
                     />
                   </div>
                   <div class="form-group">
-                    <label for="password">Brand</label>
+                    <label for="brand">Brand</label>
                     <input
                       type="text"
                       name="brand"
                       class="form-control"
                       placeholder="Enter New Brand"
+                      value="<%= item.brand %>"
                       
                     />
                   </div>
                   <div class="form-group">
-                    <label for="password2">Select New Image</label>
+                    <label for="image">Paste New Image Link</label>
                     <input
-                      type="file"
+                      type="text"
                       id="password2"
                       name="image"
                       class="form-control"
                     /> 
                   </div>
+                  <input
+                      type="hidden"
+                      id="password2"
+                      name="id"
+                      value="<%= item.id %>"
+                    />
                   
                   <!-- <div class="form-group">
                     <label for="img"> Profile img</label>
@@ -300,6 +312,7 @@
                     UPDATE
                   </button>
                 </form>
+                <% }) %>
                 <p class="lead mt-4"><a href="#"></a></p>
               </div>
             </div>

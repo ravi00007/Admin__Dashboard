@@ -67,31 +67,51 @@ app.get('/delete/:id',(req,res)=>{
         }
     })
 });
-
+  
 
 app.post('/update',upload.single('image'),(req,res)=>{
-const name= req.body.name;
-let newname = req.body.name1
-User.findOne({
-    name:name
-})
-.then(user=>{ 
-    let id = user._id
-    User.findByIdAndUpdate({})
-    User.update({"_id":id},{$set: {"name": newname,
-    "price":req.body.price,
-    "brand":req.body.brand,
-    "image": { 
-        data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)), 
-        contentType: 'image/png'
-    }
-     }}, 
-    (err,user)=>{
-        if(!err){
-            res.send('DATA UPDATED')
-        }
-    })
-})
+let name= req.body.name;
+let price = req.body.price;
+let brand = req.body.brand;
+let image = req.body.image;
+let id = req.body.id
+
+console.log(id)
+console.log(name)
+User.findByIdAndUpdate(id, { name: name , price:price,brand:brand,image:image}, 
+function (err, docs) { 
+    if (err){ 
+        console.log(err) 
+    }  
+    else{ 
+        res.redirect('/alldetails');
+        console.log("Updated User"); 
+    } 
+});
+
+
+
+// let newname = req.body.name1
+// User.findOne({
+//     name:name
+// })
+// .then(user=>{ 
+//     let id = user._id
+//     User.findByIdAndUpdate({})
+//     User.update({"_id":id},{$set: {"name": newname,
+//     "price":req.body.price,
+//     "brand":req.body.brand,
+//     "image": { 
+//         data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)), 
+//         contentType: 'image/png'
+//     }
+//      }}, 
+//     (err,user)=>{
+//         if(!err){
+//             res.send('DATA UPDATED')
+//         }
+//     })
+// })
 })
 app.get('/alldetails',(req,res)=>{
     User.find({},(err,details)=>{
@@ -168,17 +188,19 @@ app.get('/api/alldetails',(req,res)=>{
     }) 
   })
 
-//   app.get('/:id',(req,res)=>{
-//     User.find({"_id":req.params.id},(err,details)=>{
-//         if(err){
-//           console.log(err)
-//         }else{ 
-//           res.render('edit',{details:details})
-//           // .json(details)
-//           console.log(details)
-//         }
-//       })  
-//   })
+  app.get('/:id',(req,res)=>{
+    User.find({"_id":req.params.id},(err,details)=>{
+        if(err){
+          console.log(err)
+        }else{ 
+          res.render('edit',{details:details})
+          // .json(details)
+          console.log(details)
+        }
+      })  
+  })
+
+
 
 
 
