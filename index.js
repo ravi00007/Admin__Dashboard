@@ -2,12 +2,14 @@ const express =require('express');
 const bodyparser = require('body-parser');
 const mongoose = require('mongoose');
 const User = require('./models/User');
+const Cart = require('./models/Cart');
 const path = require('path');
 const multer = require('multer');
 const cors = require('cors');
 var fs = require('fs'); 
 const { throws } = require('assert');
 const Favorite = require('./models/fav');
+const { count } = require('console');
 mongoose.connect('mongodb+srv://cron:9304@ravi@cluster0.zl5bd.mongodb.net/cron?retryWrites=true&w=majority', {useNewUrlParser:true,useUnifiedTopology: true },(err)=>{
     if(!err){
         console.log("mongodb connection succeeded..")
@@ -33,6 +35,7 @@ const upload = multer({
 });
 app.use('/uploads',express.static(path.join(__dirname + 'uploads')));
 app.use('/dist',express.static('dist'))
+app.use('/products/dist',express.static('dist'))
 app.use(bodyparser.urlencoded({extended:true}));
 app.use(bodyparser.json()) 
 app.set('view engine','ejs');
@@ -45,7 +48,18 @@ app.get('/admin',(req,res)=>{
     res.render('login') 
 })
 app.get('/dashbord',(req,res)=>{
-    res.render("index"); 
+   
+
+    User.find({}).count()
+    .then(function(items){
+        res.render("index",{items:items}); 
+        console.log(items)
+    })
+    
+   
+        
+    
+    
 });
 app.get('/viewall',(req,res)=>{
     res.render('all');
@@ -57,12 +71,12 @@ app.get('/edit',(req,res)=>{
     res.render('edit')
 });
   
-app.get('/delete/:id',(req,res)=>{
+app.get('/products/delete/:id',(req,res)=>{
     User.findByIdAndDelete(req.params.id,(err,result)=>{
         if(err) throw console.log(err)
         else{
             
-            res.redirect('/alldetails');
+            res.redirect('/products/1');
             console.log('deleted');
         }
     })
@@ -75,7 +89,6 @@ let price = req.body.price;
 let brand = req.body.brand;
 let image = req.body.image;
 let id = req.body.id
-
 console.log(id)
 console.log(name)
 User.findByIdAndUpdate(id, { name: name , price:price,brand:brand,image:image}, 
@@ -84,7 +97,7 @@ function (err, docs) {
         console.log(err) 
     }  
     else{ 
-        res.redirect('/alldetails');
+        res.redirect('/products/1');
         console.log("Updated User"); 
     } 
 });
@@ -114,16 +127,81 @@ function (err, docs) {
 // })
 })
 app.get('/alldetails',(req,res)=>{
-    User.find({},(err,details)=>{
-      if(err){
-        console.log(err)
-      }else{
-        res.render('all',{details:details})
-        // .json(details)
-        console.log(details)
-      }
+    var perPage = 5
+    var page = 1;
+    var s = (perPage * page) - perPage
+    User.find({})
+    .skip(5)
+    .limit(perPage)
+    .sort({_id:-1})
+    .exec(function(err, details) {
+        User.countDocuments().exec(function(err, count) {
+            if (err) return next(err)
+            res.render('all', {
+                details: details,
+                current: page,
+                pages: Math.ceil(count / perPage)
+            })
+        })
     })
-  })
+    // User.find({},(err,details)=>{
+    //   if(err){
+    //     console.log(err)
+    //   }else{
+    //     res.render('all',{details:details})
+    //     // .json(details)
+    //     console.log(details)
+    //   }
+    // })
+  
+})
+
+app.get('/autocomplete',(req,res)=>{
+    var regex = new RegExp(req.query["term"],'i');
+    var filter = User.find({name:regex},{"name":1})
+    .sort({"updated_at":-1})
+    .sort({"created_at":-1})
+    .limit(8);
+    filter.exec(function(err,data){
+        var result =[];
+        // console.log(data)
+        if(!err){
+            if(data && data.length && data.length >0){
+                data.forEach(user=>{
+                    let obj={
+                        id:user._id,
+                        label:user.name
+                    };
+                    result.push(obj);
+                })
+            }
+        }
+        
+        res.jsonp(result);
+    })
+})
+   
+app.get('/products/:id',(req,res)=>{
+    var perPage = 5
+    var page = req.params.id|| 1
+    var s = (perPage * page) - perPage
+   
+    User.find({})
+    .skip(s)
+    .limit(perPage)
+    .sort({_id:-1})
+    .exec(function(err, details) {
+        User.countDocuments().exec(function(err, count) {
+            if (err) return next(err)
+            res.render('all', {
+                details: details,
+                current: page,
+                pages: Math.ceil(count / perPage)
+            })
+        })
+    })
+})
+
       
 app.post('/create',upload.single('image'), (req, res, next)=>{
     var obj = { 
@@ -161,7 +239,7 @@ app.post('/login',(req,res)=>{
     let p ="Admin@123456";
     if(email==e){
         if(pass===p){
-          res.render('index');
+          res.redirect('/dashbord');
         }else{
             res.send("wrong password");
         }
@@ -191,7 +269,7 @@ app.get('/api/alldetails',(req,res)=>{
   app.get('/:id',(req,res)=>{
     User.find({"_id":req.params.id},(err,details)=>{
         if(err){
-          console.log(err)
+        //   console.log(err.stack,"debug");
         }else{ 
           res.render('edit',{details:details})
           // .json(details)
@@ -300,5 +378,73 @@ app.delete("/:id/:objId", async (req, res) => {
 		console.log(error.message);
 	}
 });
+
+app.post('/new/api/create',upload.single('image'), (req, res, next)=>{
+    var obj = { 
+        name: req.body.name, 
+        price: req.body.price, 
+        brand : req.body.brand,
+        image : req.body.image,
+        title :req.body.title,
+        description:req.body.description,  
+    }
+    Cart.create(obj, (err, item) => { 
+        if (err) { 
+            console.log(err); 
+        } 
+        else { 
+             item.save(); 
+             res.status(200).json(item)
+             console.log("data inserted");
+              
+        } 
+    });
+    console.log(obj)
+});
+
+app.get('/new/api/getdetails',(req,res)=>{
+
+    Cart.find({},(err,details)=>{
+      if(err){
+        console.log(err)
+      }else{
+          res.status(200).json(details);
+        // res.render('all',{details:details})
+        // // .json(details)
+        // console.log(details)
+      }
+    }) 
+  })
+  app.delete('/new/api/delete/:id',(req,res)=>{
+    Cart.findByIdAndDelete(req.params.id,(err,result)=>{
+        if(err) throw console.log(err)
+        else{
+            res.status(200)
+            console.log('deleted');
+        }
+    })
+});
+
+app.put('/new/api/update',upload.single('image'),(req,res)=>{
+    let name= req.body.name;
+    let price = req.body.price;
+    let brand = req.body.brand;
+    let image = req.body.image;
+    let id = req.body.id
+    console.log(id)
+    console.log(name)
+    Cart.findByIdAndUpdate(id, { name: name , price:price,brand:brand,image:image}, 
+    function (err, docs) { 
+        if (err){ 
+            console.log(err) 
+        }  
+        else{ 
+         
+            console.log("Updated User"); 
+        } 
+    });
+})
+
+
 const PORT =process.env.PORT || 7000;
 app.listen(PORT, console.log(`server started at port ${PORT}`));
