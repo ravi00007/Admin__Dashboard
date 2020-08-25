@@ -40,9 +40,9 @@
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
-      <li class="nav-item d-none d-sm-inline-block mt-3">
+      <!-- <li class="nav-item d-none d-sm-inline-block mt-3">
         <a href="/dashbord" class="nav-link">Home</a>
-      </li>
+      </li> -->
       
       </li>
       <!-- <li class="nav-item d-none d-sm-inline-block mt-3"">
@@ -51,9 +51,9 @@
     </ul>
 
     <!-- SEARCH FORM -->
-    <form class="form-inline ml-3">
-      <div class="input-group input-group-sm">
-        <input id="searchName" class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+    <form autocomplete="on" class="form-inline ml-3" action="/search" method="POST">
+      <div class=" input-group input-group-sm">
+        <input id="searchName" name="searchkey" class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
         <div class="input-group-append">
           <button class="btn btn-navbar" type="submit">
             <i class="fas fa-search"></i>
@@ -158,11 +158,7 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="#" class="brand-link">
-      <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
-           style="opacity: .8">
-      <span class="brand-text font-weight-light">NODEJS </span>
-    </a>
+    
 
     <!-- Sidebar -->
     <div class="sidebar">
@@ -174,20 +170,34 @@
         <div class="info">
           <a href="#" class="d-block">Admin</a>
         </div>
-      </div>
+      </div>                 
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
+               <li class="nav-item has-treeview menu-open">
+                <a href="/dashbord" class="nav-link active">
+                  <i class="nav-icon fas fa-tachometer-alt"></i>
+                  <p>
+                    Dashboard
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
+                </a>
+                <!-- <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="/dashbord" class="nav-link active">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Dashboard</p>
+                    </a>
+                  </li>
+                </ul> -->
+              </li>
           <li class="nav-item has-treeview menu-open">
           </li>
           <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-table"></i>
-              
-            </a>
+            
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="pages/tables/data.html" class="nav-link">
@@ -235,21 +245,21 @@
                 <th >Price</th>
                 <th >Brand</th>
                 <th >Image</th>
-                <th  colspan="2">Action</th>
+                <th colspan="3">Action</th>
            
                 
-              </tr>
+              </tr>  
             </thead>
             <tbody>
               <% details.forEach(function(item){ %>
-              <tr>
+              <tr>   
                 <td><%= item.name %></td>
                 <td><%= item.price %></td>
                 <td><%= item.brand %></td>
                 <td><img src="<%= item.image %>" style="width: 45px; height: 35px;"></td>
                 <td><p><a href="delete/<%= item.id %>" class="btn btn-danger" onclick="return confirm('Are you sure want to Delete');" role="button">Delete</a></p></td>
                 <td><p><a href="/<%= item.id %>" class="btn btn-warning"  role="button">Edit</a></p></td>
-               
+                
                 
               </tr>
             </tbody>
@@ -305,7 +315,7 @@
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
-    <strong>Copyright &copy; 2014-2019 <a href="http://adminlte.io">AdminLTE.io</a>.</strong>
+    <strong>Copyright &copy; 2014-2019  <a href="https://www.bitpastel.com/" target="_blank">Bitpastel.com</a>.</strong>
     All rights reserved.
     <div class="float-right d-none d-sm-inline-block">
       <b>Version</b> 3.0.5
@@ -316,7 +326,7 @@
   <aside class="control-sidebar control-sidebar-dark">
     <!-- Control sidebar content goes here -->
   </aside>
-  <!-- /.control-sidebar -->
+  
 </div>
 <script>
 $(function(){
@@ -338,11 +348,22 @@ $('#searchName').autocomplete({
   minLength:1,
   select:function(event,ui){
     if(ui.item){
-      $("#searchName").text(ui.item.label);
+      $( "#searchName" ).css( "z-index",1000 );
+      $("#searchName").html(ui.item).css("z-index",1000);
     }
   }
 });
 });
+</script>
+<script>
+  function myFun() {
+  var x = document.getElementById("myDIV");
+  if (x.innerHTML === "Activate") {
+    x.innerHTML = "Deactivate";
+  } else if(x.innerHTML=== "Deactivate") {
+    x.innerHTML = "Activate";
+  }
+}
 </script>
 
 <!-- jQuery -->
@@ -353,7 +374,7 @@ $('#searchName').autocomplete({
 <script>
   $.widget.bridge('uibutton', $.ui.button)
 </script>
-<!-- Bootstrap 4 -->
+<!-- Bootfffffffffffffffffff -->
 <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- ChartJS -->
 <script src="plugins/chart.js/Chart.min.js"></script>

@@ -29,7 +29,8 @@ const storage = multer.diskStorage({
 
     }
 });
-
+ var counter =0;
+ var deletecounter=0;
 const upload = multer({
     storage:storage
 });
@@ -52,7 +53,11 @@ app.get('/dashbord',(req,res)=>{
 
     User.find({}).count()
     .then(function(items){
-        res.render("index",{items:items}); 
+        res.render("index",{
+            items:items,
+            counter:counter,
+            deletedcounter:deletecounter
+        }); 
         console.log(items)
     })
     
@@ -72,6 +77,7 @@ app.get('/edit',(req,res)=>{
 });
   
 app.get('/products/delete/:id',(req,res)=>{
+    deletecounter = deletecounter+1
     User.findByIdAndDelete(req.params.id,(err,result)=>{
         if(err) throw console.log(err)
         else{
@@ -89,6 +95,7 @@ let price = req.body.price;
 let brand = req.body.brand;
 let image = req.body.image;
 let id = req.body.id
+counter=counter+1
 console.log(id)
 console.log(name)
 User.findByIdAndUpdate(id, { name: name , price:price,brand:brand,image:image}, 
@@ -154,6 +161,21 @@ app.get('/alldetails',(req,res)=>{
     //   }
     // })
   
+});
+
+app.post("/search",(req,res)=>{
+    var key = req.body.searchkey;
+   if(key!=""){
+       var filter =User.find({name:key});
+       filter.exec(function(err,data){
+           if(err) throw err;
+           res.render('all',{
+               details:data,
+               current:1,
+               pages:1
+            })
+       })
+   }
 })
 
 app.get('/autocomplete',(req,res)=>{
@@ -305,9 +327,9 @@ app.post("/:id", async (req, res) => {
 				{ new: true }
 			);
 			//Delete from favlist
-			await Favorite.findOneAndDelete({ objId: req.params.id });
+			var DeletedItem =await Favorite.findOneAndDelete({ objId: req.params.id });
 			res.status(200).json({
-				unFavorite,
+				DeletedItem
 			});
 		} else {
 			// Collect the things you need
@@ -379,71 +401,83 @@ app.delete("/:id/:objId", async (req, res) => {
 	}
 });
 
-app.post('/new/api/create',upload.single('image'), (req, res, next)=>{
-    var obj = { 
-        name: req.body.name, 
-        price: req.body.price, 
-        brand : req.body.brand,
-        image : req.body.image,
-        title :req.body.title,
-        description:req.body.description,  
-    }
-    Cart.create(obj, (err, item) => { 
-        if (err) { 
-            console.log(err); 
-        } 
-        else { 
-             item.save(); 
-             res.status(200).json(item)
-             console.log("data inserted");
-              
-        } 
-    });
-    console.log(obj)
+app.post("/new/api/:id", async (req, res) => {
+	// res.send("working");
+
+	try {
+		//Pulling out the item form the db
+		const item = await User.findById(req.params.id);
+		//Check if it exists in Cart item
+		const cartExists = await Cart.findOne({ objId: req.params.id });
+		console.log(cartExists, "cartExists");
+		//If it  exist in Cart db
+		if (cartExists) {
+			console.log("item in cart Exists");
+			//If it exists in cart db then make the flag false
+			const increaseQuantity = await User.findByIdAndUpdate(
+				req.params.id,
+				{
+					item: item + 1,
+				},
+				{ new: true }
+			);
+			res.status(200).json(increaseQuantity);
+		} else {
+			// Collect the things you need
+			const cartItem = new Cart({
+				// / Ravi Put down your created proparties /
+                name:item.name,
+                price:item.price,
+                brand:item.brand,
+                image: item.image,
+				objId: item._id,
+				title: item.title,
+				description: item.description,
+			});
+			//Save it
+			const savedItem = await cartItem.save();
+
+			res.status(200).json({
+				savedItem,
+			});
+		}
+	} catch (error) {
+		res.status(400).json({ msg: "something went wrong", err: error.message });
+
+		console.log(error.stack);
+	}
 });
 
-app.get('/new/api/getdetails',(req,res)=>{
 
-    Cart.find({},(err,details)=>{
-      if(err){
-        console.log(err)
-      }else{
-          res.status(200).json(details);
-        // res.render('all',{details:details})
-        // // .json(details)
-        // console.log(details)
-      }
-    }) 
-  })
-  app.delete('/new/api/delete/:id',(req,res)=>{
-    Cart.findByIdAndDelete(req.params.id,(err,result)=>{
-        if(err) throw console.log(err)
-        else{
-            res.status(200)
-            console.log('deleted');
-        }
-    })
+
+app.get("/new/api/getdetails", async (req, res) => {
+	try {
+		const cartItems = await Cart.find({});
+		res.status(200).json(cartItems);
+	} catch (err) {
+		res.status(400).json(err);
+	}
 });
 
-app.put('/new/api/update',upload.single('image'),(req,res)=>{
-    let name= req.body.name;
-    let price = req.body.price;
-    let brand = req.body.brand;
-    let image = req.body.image;
-    let id = req.body.id
-    console.log(id)
-    console.log(name)
-    Cart.findByIdAndUpdate(id, { name: name , price:price,brand:brand,image:image}, 
-    function (err, docs) { 
-        if (err){ 
-            console.log(err) 
-        }  
-        else{ 
-         
-            console.log("Updated User"); 
-        } 
-    });
-})
+app.delete("/new/api/delete/:id", async (req, res) => {
+	try {
+		const item = await Cart.findByIdAndDelete(req.params.id);
+
+		res.status(200).json(item);
+	} catch (error) {
+		res.status(400).json(error);
+		console.log(error.message);
+	}
+});
+
+app.get("/new/api/singlefav/:id", async (req, res) => {
+	try {
+		const cartItems = await Cart.findById(req.params.id);
+		res.status(200).json(cartItems);
+	} catch (err) {
+		res.status(400).json(err);
+	}
+});
 
 
 const PORT =process.env.PORT || 7000;

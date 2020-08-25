@@ -26,6 +26,10 @@ const CartSchema = new mongoose.Schema({
     favorite: {
 		type: Boolean,
 		default: false,
+  },
+  item: {
+		type: Number,
+		default: 0,
 	},
 
     // image: 
