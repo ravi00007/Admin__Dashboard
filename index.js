@@ -87,7 +87,7 @@ app.get('/products/delete/:id',(req,res)=>{
         }
     })
 });
-  
+
 
 app.post('/update',upload.single('image'),(req,res)=>{
 let name= req.body.name;
@@ -218,13 +218,13 @@ app.get('/products/:id',(req,res)=>{
             res.render('all', {
                 details: details,
                 current: page,
+                active:'Activate',
                 pages: Math.ceil(count / perPage)
             })
         })
     })
 })
 
-      
 app.post('/create',upload.single('image'), (req, res, next)=>{
     var obj = { 
         name: req.body.name, 
@@ -300,6 +300,9 @@ app.get('/api/alldetails',(req,res)=>{
       })  
   })
 
+//   app.get('isactivate/:id',(req,res)=>{
+//       console.log("this is the id ", req.params.id)
+//   })
 
 
 
@@ -401,12 +404,13 @@ app.delete("/:id/:objId", async (req, res) => {
 	}
 });
 
-app.post("/new/api/:id", async (req, res) => {
+app.post("/new/api/for/:id", async (req, res) => {
 	// res.send("working");
-
 	try {
-		//Pulling out the item form the db
-		const item = await User.findById(req.params.id);
+        //Pulling out the item form the db
+        console.log("prams id",req.params.id);
+        const item = await User.findById(req.params.id);
+        console.log("item id",item._id);
 		//Check if it exists in Cart item
 		const cartExists = await Cart.findOne({ objId: req.params.id });
 		console.log(cartExists, "cartExists");
@@ -426,7 +430,7 @@ app.post("/new/api/:id", async (req, res) => {
 			// Collect the things you need
 			const cartItem = new Cart({
 				// / Ravi Put down your created proparties /
-                name:item.name,
+              
                 price:item.price,
                 brand:item.brand,
                 image: item.image,
@@ -442,7 +446,7 @@ app.post("/new/api/:id", async (req, res) => {
 			});
 		}
 	} catch (error) {
-		res.status(400).json({ msg: "something went wrong", err: error.message });
+		res.status(400).json({ msg: "something went wrong", err: error });
 
 		console.log(error.stack);
 	}
@@ -478,7 +482,15 @@ app.get("/new/api/singlefav/:id", async (req, res) => {
 		res.status(400).json(err);
 	}
 });
-
+app.get('/new/api/onedata/:id',(req,res)=>{
+    User.findById(req.params.id)
+    .then((data)=>{
+        res.status(200).json(data)
+    }).catch((err)=>{
+        console.log(err)
+        res.status(400).json(err)
+    })
+})
 
 const PORT =process.env.PORT || 7000;
 app.listen(PORT, console.log(`server started at port ${PORT}`));
