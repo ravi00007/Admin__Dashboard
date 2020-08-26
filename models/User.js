@@ -28,7 +28,11 @@ const UserSchema = new mongoose.Schema({
     favorite: {
 		type: Boolean,
 		default: false,
-	},
+  },
+  isactive: {
+    type: Boolean,
+    default: true
+}
 
     // image: 
     // { 

@@ -300,9 +300,35 @@ app.get('/api/alldetails',(req,res)=>{
       })  
   })
 
-//   app.get('isactivate/:id',(req,res)=>{
-//       console.log("this is the id ", req.params.id)
-//   })
+  app.get('/isactivate/:id',(req,res)=>{
+      var id = req.params.id;
+   User.findById(req.params.id,(err,docs)=>{
+       if(!err){
+           if(docs.isactive){
+               User.findByIdAndUpdate(id,{isactive:false},(e,d)=>{
+                   if(e){
+                      console.log(e)
+                   }else{
+                       
+                    res.redirect('/products/1')
+                       console.log('deativted');
+                   }
+               })
+           }else{
+            User.findByIdAndUpdate(id,{isactive:true},(e,d)=>{
+                if(e){
+                   console.log(e)
+                }else{
+                    res.redirect('/products/1')
+                    console.log('activted');
+                }
+            })
+           }
+           console.log(docs.isactive)
+       }
+   })
+      
+  })
 
 
 
