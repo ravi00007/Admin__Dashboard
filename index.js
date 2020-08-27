@@ -309,7 +309,8 @@ app.get('/api/alldetails',(req,res)=>{
                    if(e){
                       console.log(e)
                    }else{
-                       
+
+                
                     res.redirect('/products/1')
                        console.log('deativted');
                    }

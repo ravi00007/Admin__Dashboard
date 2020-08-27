@@ -259,8 +259,12 @@
                 <td><img src="<%= item.image %>" style="width: 45px; height: 35px;"></td>
                 <td><p><a href="delete/<%= item.id %>" class="btn btn-danger" onclick="return confirm('Are you sure want to Delete');" role="button">Delete</a></p></td>
                 <td><p><a href="/<%= item.id %>" class="btn btn-warning"  role="button">Edit</a></p></td>
-                <td><p><a href="/isactivate/<%= item.id %>" class="btn btn-info" onclick="return confirm('Are you sure want to Activate/Deactivate');"  role="button"><%=item.isactive%></a></p></td>
-              
+                
+                <% if (item.isactive) { %>
+                  <td><p><a href="/isactivate/<%= item.id %>" class="btn btn-info" onclick="return confirm('Are you sure want to Deactivate');"  role="button">Activate</a></p></td>
+              <% } else { %>
+                <td><p><a href="/isactivate/<%= item.id %>" class="btn btn-info" onclick="return confirm('Are you sure want to Activate');"  role="button">Deactivate</a></p></td>
+              <% } %>
               </tr>
             </tbody>
             <% }) %>
