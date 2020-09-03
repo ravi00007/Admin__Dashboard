@@ -147,7 +147,8 @@ app.get('/alldetails',(req,res)=>{
             res.render('all', {
                 details: details,
                 current: page,
-                pages: Math.ceil(count / perPage)
+                pages: Math.ceil(count / perPage),
+                viewall:false
             })
         })
     })
@@ -172,7 +173,8 @@ app.post("/search",(req,res)=>{
            res.render('all',{
                details:data,
                current:1,
-               pages:1
+               pages:1,
+               viewall:true
             })
        })
    }
@@ -219,7 +221,8 @@ app.get('/products/:id',(req,res)=>{
                 details: details,
                 current: page,
                 active:'Activate',
-                pages: Math.ceil(count / perPage)
+                pages: Math.ceil(count / perPage),
+                viewall:false
             })
         })
     })

@@ -45,9 +45,14 @@
       </li> -->
       
       </li>
-      <!-- <li class="nav-item d-none d-sm-inline-block mt-3"">
-      <p><a href="/creat" class="btn btn-success"  role="button">ADD Product</a></p>
-      </li> -->
+      <% if (viewall) { %>
+        <li class="nav-item d-none d-sm-inline-block mt-3"">
+          <p><a href="/products/1" class="btn btn-success"  role="button">View All</a></p>
+          </li>
+        <% } else { %>
+              
+       <% } %>
+      
     </ul>
 
     <!-- SEARCH FORM -->
@@ -260,9 +265,9 @@
                 <td><p><a href="/<%= item.id %>" class="btn btn-warning"  role="button">Edit</a></p></td>
                 
                 <% if (item.isactive) { %>
-                  <td><p><a href="/isactivate/<%= item.id %>" class="btn btn-info" onclick="return confirm('Are you sure want to Deactivate');"  role="button">Activate</a></p></td>
+                  <td><p><a href="/isactivate/<%= item.id %>" class="btn btn-info" onclick="return confirm('Are you sure want to Deactivate');"  role="button">Active</a></p></td>
               <% } else { %>
-                <td><p><a href="/isactivate/<%= item.id %>" class="btn btn-danger" onclick="return confirm('Are you sure want to Activate');"  role="button">Deactivate</a></p></td>
+                <td><p><a href="/isactivate/<%= item.id %>" class="btn btn-danger" onclick="return confirm('Are you sure want to Activate');"  role="button">Inative</a></p></td>
               <% } %>
               </tr>
             </tbody>
@@ -318,11 +323,12 @@
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
-    <strong>Copyright &copy; 2014-2019  <a href="https://www.bitpastel.com/" target="_blank">Bitpastel.com</a>.</strong>
-    All rights reserved.
+    <strong>Copyright &copy; <script>document.write(new Date().getFullYear())</script></strong>
+    All rights reserved by <a href="https://www.bitpastel.com/" target="_blank">Bitpastel.com</a>
     <div class="float-right d-none d-sm-inline-block">
       <b>Version</b> 3.0.5
     </div>
+    <!-- <p>Copyright &copy; <script>document.write(new Date().getFullYear())</script> Kerstin Martin All Rights Reserved</p> -->
   </footer>
 
   <!-- Control Sidebar -->
@@ -351,14 +357,14 @@ $('#searchName').autocomplete({
   minLength:1,
   select:function(event,ui){
     if(ui.item){
-      $( "#searchName" ).css( "z-index",1000 );
-      $("#searchName").html(ui.item).css("z-index",1000);
+      $( "#searchName" );
+      $("#searchName").html(ui.item);
     }
   }
 });
 });
 </script>
-<script>
+<!-- <script>
   function myFun() {
   var x = document.getElementById("myDIV");
   if (x.innerHTML === "Activate") {
@@ -367,7 +373,7 @@ $('#searchName').autocomplete({
     x.innerHTML = "Activate";
   }
 }
-</script>
+</script> -->
 
 <!-- jQuery -->
 <script src="plugins/jquery/jquery.min.js"></script>
