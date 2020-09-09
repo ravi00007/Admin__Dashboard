@@ -7,9 +7,19 @@ const path = require('path');
 const multer = require('multer');
 const cors = require('cors');
 var fs = require('fs'); 
+const { v4: uuidv4 } = require('uuid');
 const { throws } = require('assert');
 const Favorite = require('./models/fav');
 const { count } = require('console');
+const admin = require('firebase-admin');
+const serviceAccount = require('./ServiceAccountkey.json');
+const { Storage } = require('@google-cloud/storage');
+const multerGoogleStorage = require('multer-google-storage');
+const { url } = require('inspector');
+const  session = require('express-session');
+const  flash = require('connect-flash');
+
+
 mongoose.connect('mongodb+srv://cron:9304@ravi@cluster0.zl5bd.mongodb.net/cron?retryWrites=true&w=majority', {useNewUrlParser:true,useUnifiedTopology: true },(err)=>{
     if(!err){
         console.log("mongodb connection succeeded..")
@@ -17,10 +27,17 @@ mongoose.connect('mongodb+srv://cron:9304@ravi@cluster0.zl5bd.mongodb.net/cron?r
     else{
     console.log('error in :' + err)
     }
-})
+})  
 const app = express();
 app.use(cors());
-const storage = multer.diskStorage({
+app.use(session({
+    secret: 'secret',
+    cookie:{maxAge:6000},
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(flash);
+const store = multer.diskStorage({
     destination:function(req,file,cb){
         cb(null,"uploads")
     },
@@ -29,16 +46,32 @@ const storage = multer.diskStorage({
 
     }
 });
+
+const upload = multer({
+    storage:store
+});
+
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://fir-crud-restapi-ac1a1.firebaseio.com",
+    storageBucket: "gs://fir-crud-restapi-ac1a1.appspot.com/"
+ });
  var counter =0;
  var deletecounter=0;
-const upload = multer({
-    storage:storage
-});
+
+const storage =  new Storage({
+   projectId: "fir-crud-restapi-ac1a1",
+   keyFilename: "./ServiceAccountkey.json"
+ });
+
+const bucketName = "gs://fir-crud-restapi-ac1a1.appspot.com"
 app.use('/uploads',express.static(path.join(__dirname + 'uploads')));
 app.use('/dist',express.static('dist'))
 app.use('/products/dist',express.static('dist'))
 app.use(bodyparser.urlencoded({extended:true}));
 app.use(bodyparser.json()) 
+app.use(cors());
 app.set('view engine','ejs');
 //--------------------------------------------------------------
 
@@ -71,7 +104,10 @@ app.get('/viewall',(req,res)=>{
 })
 app.get('/creat',(req,res)=>{
     res.render('create')
-});  
+});
+app.get('/creatupdated',(req,res)=>{
+    res.render('createupdated')
+})  
 app.get('/edit',(req,res)=>{
     res.render('edit')
 });
@@ -88,50 +124,86 @@ app.get('/products/delete/:id',(req,res)=>{
     })
 });
 
+  //,upload.single('image') pste on below route
+app.post('/update',upload.single('myfile'),(req,res)=>{
+    (async () => {
+    
+        hostedimage ='';
+        try {
 
-app.post('/update',upload.single('image'),(req,res)=>{
-let name= req.body.name;
-let price = req.body.price;
-let brand = req.body.brand;
-let image = req.body.image;
-let id = req.body.id
-counter=counter+1
-console.log(id)
-console.log(name)
-User.findByIdAndUpdate(id, { name: name , price:price,brand:brand,image:image}, 
-function (err, docs) { 
-    if (err){ 
-        console.log(err) 
-    }  
-    else{ 
-        res.redirect('/products/1');
-        console.log("Updated User"); 
-    } 
-});
+            
+           //upload a file to the bucket using multer
+            filetobeuploded = req.file.path 
+            console.log("this is file path",req.file.path )
+            let uuid =uuidv4()
+             await storage.bucket(bucketName).upload(filetobeuploded, {
+               gzip: true,
+            
+             metadata: {
+                firebaseStorageDownloadTokens: uuid,
+                cacheControl: 'public, max-age=31536000',
+            },
+           
+         }).then((data) => {
+         
+            let file = data[0];
+             
+            // return Promise.resolve("https://firebasestorage.googleapis.com/v0/b/" + bucketName + "/o/" + encodeURIComponent(req.file.name) + "?alt=media&token=" + uuid);
+            console.log("https://firebasestorage.googleapis.com/v0/b/" + "fir-crud-restapi-ac1a1.appspot.com" + "/o/" + encodeURIComponent(file.name) + "?alt=media&token=" + uuid)
+            hostedimage = "https://firebasestorage.googleapis.com/v0/b/" + "fir-crud-restapi-ac1a1.appspot.com" + "/o/" + encodeURIComponent(file.name) + "?alt=media&token=" + uuid;
+            
+              let  name = req.body.name
+              let  price = req.body.price 
+              let  brand = req.body.brand
+              let  image = hostedimage
+              let  title = req.body.title
+              let  description=req.body.description
+              let id = req.body.id;
+                
+                // image: { 
+                //     data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)), 
+                //     contentType: 'image/png'
+                // }  
+            
+            // console.log("this is object ",obj);
+            User.findByIdAndUpdate(id, { name: name , price:price,brand:brand,image:image,title:title,description:description}, 
+                function (err, docs) { 
+                    if (err){ 
+                        console.log(err) 
+                    }  
+                    else{ 
+                        res.redirect('/products/1');
+                        console.log("Updated User"); 
+                    } 
+                });
+            
+            
 
+        });
 
+        //  console.log(`${filetobeuploded} uploaded to ${bucketName}.`);
+        //  return res.status(200);
 
-// let newname = req.body.name1
-// User.findOne({
-//     name:name
-// })
-// .then(user=>{ 
-//     let id = user._id
-//     User.findByIdAndUpdate({})
-//     User.update({"_id":id},{$set: {"name": newname,
-//     "price":req.body.price,
-//     "brand":req.body.brand,
-//     "image": { 
-//         data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)), 
-//         contentType: 'image/png'
-//     }
-//      }}, 
-//     (err,user)=>{
-//         if(!err){
-//             res.send('DATA UPDATED')
-//         }
-//     })
-// })
+           
+        }
+        catch (error) {
+           console.log("mine debug=>",error.stack);
+           return res.status(500).send(error)
+        }
+  
+     })();
+
+// User.findByIdAndUpdate(id, { name: name , price:price,brand:brand,image:image}, 
+// function (err, docs) { 
+//     if (err){ 
+//         console.log(err) 
+//     }  
+//     else{ 
+//         res.redirect('/products/1');
+//         console.log("Updated User"); 
+//     } 
+// });
+
 })
 app.get('/alldetails',(req,res)=>{
     var perPage = 5
@@ -228,30 +300,108 @@ app.get('/products/:id',(req,res)=>{
     })
 })
 
-app.post('/create',upload.single('image'), (req, res, next)=>{
+// app.get("/google/upload",(req,res)=>{
+//     res.render("fileupload");
+// })
+
+
+app.post("/google/upload",upload.single('myfile'),(req,res)=>{
+    
+    (async () => {
+    
+        hostedimage ='';
+        try {
+
+            
+           //upload a file to the bucket using multer
+            filetobeuploded = req.file.path 
+            let uuid =uuidv4()
+             await storage.bucket(bucketName).upload(filetobeuploded, {
+               gzip: true,
+            
+             metadata: {
+                firebaseStorageDownloadTokens: uuid,
+                cacheControl: 'public, max-age=31536000',
+            },
+           
+         }).then((data) => {
+         
+            let file = data[0];
+             console.log("this is url",url("https://firebasestorage.googleapis.com/v0/b/" + "fir-crud-restapi-ac1a1.appspot.com" + "/o/" + encodeURIComponent(file.name) + "?alt=media&token=" + uuid))
+            // return Promise.resolve("https://firebasestorage.googleapis.com/v0/b/" + bucketName + "/o/" + encodeURIComponent(req.file.name) + "?alt=media&token=" + uuid);
+            console.log("https://firebasestorage.googleapis.com/v0/b/" + "fir-crud-restapi-ac1a1.appspot.com" + "/o/" + encodeURIComponent(file.name) + "?alt=media&token=" + uuid)
+            hostedimage = "https://firebasestorage.googleapis.com/v0/b/" + "fir-crud-restapi-ac1a1.appspot.com" + "/o/" + encodeURIComponent(file.name) + "?alt=media&token=" + uuid;
+            var obj = { 
+                name: req.body.name, 
+                price: req.body.price, 
+                brand : req.body.brand,
+                image : hostedimage,
+                title :req.body.title,
+                description:req.body.description,
+                
+                // image: { 
+                //     data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)), 
+                //     contentType: 'image/png'
+                // }  
+            }
+            // console.log("this is object ",obj);
+            User.create(obj, (err, item) => { 
+                if (err) { 
+                    console.log(err); 
+                } 
+                else { 
+                     item.save(); 
+                     console.log('product added');
+                     res.redirect('/products/1');
+                } 
+            });
+            console.log(obj)
+            
+
+        });
+
+         console.log(`${filetobeuploded} uploaded to ${bucketName}.`);
+        //  return res.status(200);
+
+           
+        }
+        catch (error) {
+           console.log("mine debug=>",error.stack);
+           return res.status(500).send(error)
+        }
+  
+     })();
+     
+    
+    
+})
+//,upload.single('image'), paste on below route
+
+app.post('/create',upload.single('myfile'),(req, res, next)=>{
+    
+    
     var obj = { 
         name: req.body.name, 
         price: req.body.price, 
         brand : req.body.brand,
-        image : req.body.image,
         title :req.body.title,
-        description:req.body.description,
-        
-        // image: { 
+        des:req.body.des,
+                // image: { 
         //     data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)), 
         //     contentType: 'image/png'
         // }  
     }
-    User.create(obj, (err, item) => { 
-        if (err) { 
-            console.log(err); 
-        } 
-        else { 
-             item.save(); 
-             console.log('product added');
-             res.redirect('/dashbord'); 
-        } 
-    });
+    // User.create(obj, (err, item) => { 
+    //     console.log("this is item", item)
+    //     if (err) { 
+    //         console.log(err); 
+    //     } 
+    //     else { 
+    //         //  item.save(); 
+    //         //  console.log('product added');
+    //         //  res.redirect('/dashbord'); 
+    //     } 
+    // })
     console.log(obj)
 })
 
@@ -483,7 +633,7 @@ app.post("/new/api/for/:id", async (req, res) => {
 });
 
 
-
+///get all cart items
 app.get("/new/api/getdetails", async (req, res) => {
 	try {
 		const cartItems = await Cart.find({});
