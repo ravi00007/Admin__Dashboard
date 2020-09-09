@@ -30,13 +30,13 @@ mongoose.connect('mongodb+srv://cron:9304@ravi@cluster0.zl5bd.mongodb.net/cron?r
 })  
 const app = express();
 app.use(cors());
-app.use(session({
-    secret: 'secret',
-    cookie:{maxAge:6000},
-    resave: false,
-    saveUninitialized: false
-}));
-app.use(flash);
+// app.use(session({
+//     secret: 'secret',
+//     cookie:{maxAge:6000},
+//     resave: false,
+//     saveUninitialized: false
+// }));
+// app.use(flash);
 const store = multer.diskStorage({
     destination:function(req,file,cb){
         cb(null,"uploads")
