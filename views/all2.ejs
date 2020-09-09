@@ -82,7 +82,7 @@
     <ul class="navbar-nav ml-auto">
       <!-- Messages Dropdown Menu -->
       <li class="nav-item dropdown">
-        <p><a href="/creatupdated" class="btn btn-success"  role="button">Add Product</a></p>
+        <p><a href="/creatupdated2" class="btn btn-success"  role="button">Add Product</a></p>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
           <a href="#" class="dropdown-item">
             <!-- Message Start -->
@@ -294,12 +294,12 @@
                 <td><%= item.brand %></td>
                 <td><img src="<%= item.image %>" style="width: 45px; height: 35px;"></td>
                 <td><p><a href="delete/<%= item.id %>" class="btn btn-danger" onclick="return confirm('Are you sure want to Delete');" role="button">Delete</a></p></td>
-                <td><p><a href="/<%= item.id %>" class="btn btn-warning"  role="button">Edit</a></p></td>
+                <td><p><a href="/sec/<%= item.id %>" class="btn btn-warning"  role="button">Edit</a></p></td>
                 
                 <% if (item.isactive) { %>
-                  <td><p><a href="/isactivate/<%= item.id %>" class="btn btn-info" onclick="return confirm('Are you sure want to Deactivate');"  role="button">Active</a></p></td>
+                  <td><p><a href="/isactivatesecond/<%= item.id %>" class="btn btn-info" onclick="return confirm('Are you sure want to Deactivate');"  role="button">Active</a></p></td>
               <% } else { %>
-                <td><p><a href="/isactivate/<%= item.id %>" class="btn btn-danger" onclick="return confirm('Are you sure want to Activate');"  role="button">Inative</a></p></td>
+                <td><p><a href="/isactivatesecond/<%= item.id %>" class="btn btn-danger" onclick="return confirm('Are you sure want to Activate');"  role="button">Inative</a></p></td>
               <% } %>
               </tr>
             </tbody>

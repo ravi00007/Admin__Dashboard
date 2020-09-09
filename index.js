@@ -3,6 +3,7 @@ const bodyparser = require('body-parser');
 const mongoose = require('mongoose');
 const User = require('./models/User');
 const Cart = require('./models/Cart');
+const User2  = require('./models/second');
 const path = require('path');
 const multer = require('multer');
 const cors = require('cors');
@@ -20,6 +21,7 @@ const  session = require('express-session');
 const  flash = require('connect-flash');
 
 
+
 mongoose.connect('mongodb+srv://cron:9304@ravi@cluster0.zl5bd.mongodb.net/cron?retryWrites=true&w=majority', {useNewUrlParser:true,useUnifiedTopology: true },(err)=>{
     if(!err){
         console.log("mongodb connection succeeded..")
@@ -30,13 +32,14 @@ mongoose.connect('mongodb+srv://cron:9304@ravi@cluster0.zl5bd.mongodb.net/cron?r
 })  
 const app = express();
 app.use(cors());
-// app.use(session({
-//     secret: 'secret',
-//     cookie:{maxAge:6000},
-//     resave: false,
-//     saveUninitialized: false
-// }));
-// app.use(flash);
+app.use(session({
+    secret: 'secret',
+    cookie:{maxAge:6000},
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(flash());
+
 const store = multer.diskStorage({
     destination:function(req,file,cb){
         cb(null,"uploads")
@@ -45,7 +48,7 @@ const store = multer.diskStorage({
         cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname));
 
     }
-});
+}); 
 
 const upload = multer({
     storage:store
@@ -69,6 +72,8 @@ const bucketName = "gs://fir-crud-restapi-ac1a1.appspot.com"
 app.use('/uploads',express.static(path.join(__dirname + 'uploads')));
 app.use('/dist',express.static('dist'))
 app.use('/products/dist',express.static('dist'))
+app.use('/second/dist',express.static('dist'))
+app.use('/sec/dist',express.static('dist'))
 app.use(bodyparser.urlencoded({extended:true}));
 app.use(bodyparser.json()) 
 app.use(cors());
@@ -108,16 +113,22 @@ app.get('/creat',(req,res)=>{
 app.get('/creatupdated',(req,res)=>{
     res.render('createupdated')
 })  
+app.get('/creatupdated2',(req,res)=>{
+    res.render('secondcreate');
+})   
 app.get('/edit',(req,res)=>{
     res.render('edit')
 });
   
 app.get('/products/delete/:id',(req,res)=>{
-    deletecounter = deletecounter+1
+    
     User.findByIdAndDelete(req.params.id,(err,result)=>{
         if(err) throw console.log(err)
         else{
-            
+            req.flash(
+                'success_msg',
+                'Deleted Successfully'
+              );
             res.redirect('/products/1');
             console.log('deleted');
         }
@@ -172,6 +183,10 @@ app.post('/update',upload.single('myfile'),(req,res)=>{
                         console.log(err) 
                     }  
                     else{ 
+                        req.flash(
+                            'success_msg',
+                            'Updated Successfully'
+                          );
                         res.redirect('/products/1');
                         console.log("Updated User"); 
                     } 
@@ -236,6 +251,7 @@ app.get('/alldetails',(req,res)=>{
   
 });
 
+
 app.post("/search",(req,res)=>{
     var key = req.body.searchkey;
    if(key!=""){
@@ -246,7 +262,8 @@ app.post("/search",(req,res)=>{
                details:data,
                current:1,
                pages:1,
-               viewall:true
+               viewall:true,
+               success_msg: req.flash('success_msg')
             })
        })
    }
@@ -294,7 +311,8 @@ app.get('/products/:id',(req,res)=>{
                 current: page,
                 active:'Activate',
                 pages: Math.ceil(count / perPage),
-                viewall:false
+                viewall:false,
+                success_msg: req.flash('success_msg')
             })
         })
     })
@@ -351,6 +369,10 @@ app.post("/google/upload",upload.single('myfile'),(req,res)=>{
                 } 
                 else { 
                      item.save(); 
+                     req.flash(
+                        'success_msg',
+                        'Added Successfully'
+                      );
                      console.log('product added');
                      res.redirect('/products/1');
                 } 
@@ -463,7 +485,10 @@ app.get('/api/alldetails',(req,res)=>{
                       console.log(e)
                    }else{
 
-                
+                    req.flash(
+                        'success_msg',
+                        ' Deactivated'
+                      );
                     res.redirect('/products/1')
                        console.log('deativted');
                    }
@@ -473,6 +498,10 @@ app.get('/api/alldetails',(req,res)=>{
                 if(e){
                    console.log(e)
                 }else{
+                    req.flash(
+                        'success_msg',
+                        ' Activated'
+                      );
                     res.redirect('/products/1')
                     console.log('activted');
                 }
@@ -671,6 +700,265 @@ app.get('/new/api/onedata/:id',(req,res)=>{
         res.status(400).json(err)
     })
 })
+
+
+/// routes for second crousel
+
+app.get('/second/:id',(req,res)=>{
+    var perPage = 5
+    var page = req.params.id|| 1
+    var s = (perPage * page) - perPage
+   
+    User2.find({})
+    .skip(s)
+    .limit(perPage)
+    .sort({_id:-1})
+    .exec(function(err, details) {
+        User2.countDocuments().exec(function(err, count) {
+            if (err) return next(err)
+            res.render('all2', {
+                details: details,
+                current: page,
+                active:'Activate',
+                pages: Math.ceil(count / perPage),
+                viewall:false,
+                success_msg: req.flash('success_msg')
+            })
+        })
+    })
+})
+
+app.get('/second/delete/:id',(req,res)=>{
+    
+    User2.findByIdAndDelete(req.params.id,(err,result)=>{
+        if(err) throw console.log(err)
+        else{
+            req.flash(
+                'success_msg',
+                'Deleted Successfully'
+              );
+            res.redirect('/second/1');
+            console.log('deleted');
+        }
+    })
+});
+  
+app.get('/sec/:id',(req,res)=>{
+    console.log('edit')
+    User2.find({"_id":req.params.id},(err,details)=>{
+        if(err){
+        //   console.log(err.stack,"debug");
+        }else{ 
+          res.render('edit2',{details:details})
+          // .json(details)
+          console.log(details)
+        }
+      })  
+  })
+
+  app.post('/sec/update',upload.single('myfile'),(req,res)=>{
+    (async () => {
+    
+        hostedimage ='';
+        try {
+
+            
+           //upload a file to the bucket using multer
+            filetobeuploded = req.file.path 
+            console.log("this is file path",req.file.path )
+            let uuid =uuidv4()
+             await storage.bucket(bucketName).upload(filetobeuploded, {
+               gzip: true,
+            
+             metadata: {
+                firebaseStorageDownloadTokens: uuid,
+                cacheControl: 'public, max-age=31536000',
+            },
+           
+         }).then((data) => {
+         
+            let file = data[0];
+             
+            // return Promise.resolve("https://firebasestorage.googleapis.com/v0/b/" + bucketName + "/o/" + encodeURIComponent(req.file.name) + "?alt=media&token=" + uuid);
+            console.log("https://firebasestorage.googleapis.com/v0/b/" + "fir-crud-restapi-ac1a1.appspot.com" + "/o/" + encodeURIComponent(file.name) + "?alt=media&token=" + uuid)
+            hostedimage = "https://firebasestorage.googleapis.com/v0/b/" + "fir-crud-restapi-ac1a1.appspot.com" + "/o/" + encodeURIComponent(file.name) + "?alt=media&token=" + uuid;
+            
+              let  name = req.body.name
+              let  price = req.body.price 
+              let  brand = req.body.brand
+              let  image = hostedimage
+              let  title = req.body.title
+              let  description=req.body.description
+              let id = req.body.id;
+                
+                // image: { 
+                //     data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)), 
+                //     contentType: 'image/png'
+                // }  
+            
+            // console.log("this is object ",obj);
+            User2.findByIdAndUpdate(id, { name: name , price:price,brand:brand,image:image,title:title,description:description}, 
+                function (err, docs) { 
+                    if (err){ 
+                        console.log(err) 
+                    }  
+                    else{ 
+                        req.flash(
+                            'success_msg',
+                            'Updated Successfully'
+                          );
+                        res.redirect('/second/1');
+                        console.log("Updated User"); 
+                    } 
+                });
+            
+            
+
+        });
+
+        //  console.log(`${filetobeuploded} uploaded to ${bucketName}.`);
+        //  return res.status(200);
+
+           
+        }
+        catch (error) {
+           console.log("mine debug=>",error.stack);
+           return res.status(500).send(error)
+        }
+  
+     })();
+  })
+
+app.get('/isactivatesecond/:id',(req,res)=>{
+    var id = req.params.id;
+ User2.findById(req.params.id,(err,docs)=>{
+     if(!err){
+         if(docs.isactive){
+             User2.findByIdAndUpdate(id,{isactive:false},(e,d)=>{
+                 if(e){
+                    console.log(e)
+                 }else{
+
+                    req.flash(
+                        'success_msg',
+                        ' Deactivated'
+                      );
+                    res.redirect('/second/1')
+                     console.log('deativted');
+                 }
+             })
+         }
+         else{
+          User2.findByIdAndUpdate(id,{isactive:true},(e,d)=>{
+              if(e){
+                 console.log(e)
+              }else{
+                req.flash(
+                    'success_msg',
+                    'Activated '
+                  );
+                  res.redirect('/second/1')
+                  console.log('activted');
+              }
+          })
+         }
+         console.log(docs.isactive)
+     }
+ })
+    
+})
+app.post("/google/up",upload.single('myfile'),(req,res)=>{
+    
+    (async () => {
+    
+        hostedimage ='';
+        try {
+
+            
+           //upload a file to the bucket using multer
+            filetobeuploded = req.file.path 
+            let uuid =uuidv4()
+             await storage.bucket(bucketName).upload(filetobeuploded, {
+               gzip: true,
+            
+             metadata: {
+                firebaseStorageDownloadTokens: uuid,
+                cacheControl: 'public, max-age=31536000',
+            },
+           
+         }).then((data) => {
+         
+            let file = data[0];
+             console.log("this is url",url("https://firebasestorage.googleapis.com/v0/b/" + "fir-crud-restapi-ac1a1.appspot.com" + "/o/" + encodeURIComponent(file.name) + "?alt=media&token=" + uuid))
+            // return Promise.resolve("https://firebasestorage.googleapis.com/v0/b/" + bucketName + "/o/" + encodeURIComponent(req.file.name) + "?alt=media&token=" + uuid);
+            console.log("https://firebasestorage.googleapis.com/v0/b/" + "fir-crud-restapi-ac1a1.appspot.com" + "/o/" + encodeURIComponent(file.name) + "?alt=media&token=" + uuid)
+            hostedimage = "https://firebasestorage.googleapis.com/v0/b/" + "fir-crud-restapi-ac1a1.appspot.com" + "/o/" + encodeURIComponent(file.name) + "?alt=media&token=" + uuid;
+            var obj = { 
+                name: req.body.name, 
+                price: req.body.price, 
+                brand : req.body.brand,
+                image : hostedimage,
+                title :req.body.title,
+                description:req.body.description,
+                
+                // image: { 
+                //     data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)), 
+                //     contentType: 'image/png'
+                // }  
+            }
+            // console.log("this is object ",obj);
+            User2.create(obj, (err, item) => { 
+                if (err) { 
+                    console.log(err); 
+                } 
+                else { 
+                     item.save(); 
+                     req.flash(
+                        'success_msg',
+                        'Added Successfully'
+                      );
+                     console.log('product added');
+                     res.redirect('/second/1');
+                } 
+            });
+            console.log(obj)
+            
+
+        });
+
+         console.log(`${filetobeuploded} uploaded to ${bucketName}.`);
+        //  return res.status(200);
+
+           
+        }
+        catch (error) {
+           console.log("mine debug=>",error.stack);
+           return res.status(500).send(error)
+        }
+  
+     })();
+})
+
+app.get('/api/user2/alldetails',(req,res)=>{
+
+    User2.find({},(err,details)=>{
+      if(err){
+        console.log(err)
+      }else{
+          res.status(200).json(details);
+        // res.render('all',{details:details})
+        // // .json(details)
+        // console.log(details)
+      }
+    }) 
+  })
+// app.post("/sd",upload.single('myfile'),(req,res)=>{
+    
+//    console.log('right route')
+     
+    
+    
+// })
 
 const PORT =process.env.PORT || 7000;
 app.listen(PORT, console.log(`server started at port ${PORT}`));

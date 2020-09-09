@@ -26,6 +26,10 @@
   <link rel="stylesheet" href="plugins/summernote/summernote-bs4.css">
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+  <link class="jsbin" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
+  <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+  <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
+  <meta charset=utf-8 />
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -300,6 +304,7 @@
                       placeholder="Enter Name Of Brand"
                     />
                   </div>
+                  <img id="blah" src="#" alt="" style="width: 35px;height: 35px;" />
                   <div class="form-group">
                     <label for="password2"> Selcet Image</label>
                     <input
@@ -307,6 +312,7 @@
                       id="password2"
                       name="myfile"
                       class="form-control"
+                      onchange="readURL(this);"
                     /> 
                   </div>
                   
@@ -367,6 +373,25 @@
 <!-- ./wrapper -->
 
 <!-- jQuery -->
+
+<script>
+ 
+  function readURL(input) {
+   
+           if (input.files && input.files[0]) {
+               var reader = new FileReader();
+
+               reader.onload = function (e) {
+                   $('#blah')
+                       .attr('src', e.target.result)
+                       .width(45)
+                       .height(35);
+               };
+
+               reader.readAsDataURL(input.files[0]);
+           }
+       }
+</script>
 <script src="plugins/jquery/jquery.min.js"></script>
 <!-- jQuery UI 1.11.4 -->
 <script src="plugins/jquery-ui/jquery-ui.min.js"></script>
