@@ -616,7 +616,7 @@ app.post("/:id/:list", async (req, res) => {
         }
         else{
             //Pulling out the item form the db
-		const item = await User.findById(req.params.id);
+		const item = await User2.findById(req.params.id);
 		//Check if it exists in fav item
 		const favExists = await Favorite.findOne({ objId: req.params.id });
 		console.log(favExists, "favExists");
