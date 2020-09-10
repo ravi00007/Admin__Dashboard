@@ -711,11 +711,51 @@ app.post("/new/api/for/:id", async (req, res) => {
 });
 
 //  cart post route for product 1 
-app.post("/new/api/for/product2/:id", async (req, res) => {
-	// res.send("working");
+app.post("/new/api/for/product2/:id/:list", async (req, res) => {
+    // res.send("working");
+    
 	try {
-        //Pulling out the item form the db
-        console.log("prams id",req.params.id);
+        if(req.params.list == '1'){
+            console.log("prams id",req.params.id);
+            const item = await User.findById(req.params.id);
+            console.log("item id",item._id);
+            //Check if it exists in Cart item
+            const cartExists = await Cart.findOne({ objId: req.params.id });
+            console.log(cartExists, "cartExists");
+            //If it  exist in Cart db
+            if (cartExists) {
+                console.log("item in cart Exists");
+                //If it exists in cart db then make the flag false
+                const increaseQuantity = await User.findByIdAndUpdate(
+                    req.params.id,
+                    {
+                        item: item + 1,
+                    },
+                    { new: true }
+                );
+                res.status(200).json(increaseQuantity);
+            } else {
+                // Collect the things you need
+                const cartItem = new Cart({
+                    // / Ravi Put down your created proparties /
+                  
+                    price:item.price,
+                    brand:item.brand,
+                    image: item.image,
+                    objId: item._id,
+                    title: item.title,
+                    description: item.description,
+                });
+                //Save it 
+                const savedItem = await cartItem.save();
+    
+                res.status(200).json({
+                    savedItem,
+                });
+            }
+        }
+        else{
+            console.log("prams id",req.params.id);
         const item = await User2.findById(req.params.id);
         console.log("item id",item._id);
 		//Check if it exists in Cart item
@@ -752,6 +792,9 @@ app.post("/new/api/for/product2/:id", async (req, res) => {
 				savedItem,
 			});
 		}
+        }
+        //Pulling out the item form the db
+        
 	} catch (error) {
 		res.status(400).json({ msg: "something went wrong", err: error });
 
