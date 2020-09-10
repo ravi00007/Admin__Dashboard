@@ -258,6 +258,7 @@
                       id="name"
                       name="name"
                       class="form-control"
+                      required
                       placeholder="Enter Product Name"
                       value="<%= typeof name != 'undefined' ? name : '' %>"
                     />
@@ -269,6 +270,7 @@
                       id="name"
                       name="title"
                       class="form-control"
+                      required
                       placeholder="Enter Product Name"
                       value="<%= typeof name != 'undefined' ? name : '' %>"
                     />
@@ -280,6 +282,7 @@
                       id="name"
                       name="description"
                       class="form-control"
+                      required
                       placeholder="Enter Product Name"
                       value="<%= typeof name != 'undefined' ? name : '' %>"
                     />
@@ -291,6 +294,7 @@
                       id="email"
                       name="price"
                       class="form-control"
+                      required
                       placeholder="Enter Product Price"
                       value="<%= typeof email != 'undefined' ? email : '' %>"
                     />
@@ -300,6 +304,7 @@
                     <input
                       type="text"
                       name="brand"
+                      required
                       class="form-control"
                       placeholder="Enter Name Of Brand"
                     />
@@ -311,6 +316,7 @@
                       type="file"
                       id="password2"
                       name="myfile"
+                      required
                       class="form-control"
                       onchange="readURL(this);"
                     /> 

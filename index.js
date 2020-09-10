@@ -88,11 +88,23 @@ app.get('/admin',(req,res)=>{
 })
 app.get('/dashbord',(req,res)=>{
    
-
+    array=[];
+    User2.find({}).count()
+    .then((it)=>{
+        array.push(it)
+       
+    })
     User.find({}).count()
     .then(function(items){
+        array.push(items)
+        var sum = array.reduce(function(a, b){
+        return a + b;
+    }, 0);
+        console.log('this is final sum',sum)
+        console.log("sum after add",sum);
+
         res.render("index",{
-            items:items,
+            items:sum,
             counter:counter,
             deletedcounter:deletecounter
         }); 
@@ -127,7 +139,7 @@ app.get('/products/delete/:id',(req,res)=>{
         else{
             req.flash(
                 'success_msg',
-                'Deleted Successfully'
+                'Product Deleted Successfully'
               );
             res.redirect('/products/1');
             console.log('deleted');
@@ -135,78 +147,112 @@ app.get('/products/delete/:id',(req,res)=>{
     })
 });
 
+
   //,upload.single('image') pste on below route
 app.post('/update',upload.single('myfile'),(req,res)=>{
-    (async () => {
+    if(req.file){
+        (async () => {
     
-        hostedimage ='';
-        try {
-
-            
-           //upload a file to the bucket using multer
-            filetobeuploded = req.file.path 
-            console.log("this is file path",req.file.path )
-            let uuid =uuidv4()
-             await storage.bucket(bucketName).upload(filetobeuploded, {
-               gzip: true,
-            
-             metadata: {
-                firebaseStorageDownloadTokens: uuid,
-                cacheControl: 'public, max-age=31536000',
-            },
-           
-         }).then((data) => {
-         
-            let file = data[0];
-             
-            // return Promise.resolve("https://firebasestorage.googleapis.com/v0/b/" + bucketName + "/o/" + encodeURIComponent(req.file.name) + "?alt=media&token=" + uuid);
-            console.log("https://firebasestorage.googleapis.com/v0/b/" + "fir-crud-restapi-ac1a1.appspot.com" + "/o/" + encodeURIComponent(file.name) + "?alt=media&token=" + uuid)
-            hostedimage = "https://firebasestorage.googleapis.com/v0/b/" + "fir-crud-restapi-ac1a1.appspot.com" + "/o/" + encodeURIComponent(file.name) + "?alt=media&token=" + uuid;
-            
-              let  name = req.body.name
-              let  price = req.body.price 
-              let  brand = req.body.brand
-              let  image = hostedimage
-              let  title = req.body.title
-              let  description=req.body.description
-              let id = req.body.id;
+            hostedimage ='';
+            try {
+               //upload a file to the bucket using multer
+                filetobeuploded = req.file.path 
+                console.log("this is file path",req.file.path )
+                let uuid =uuidv4()
+                 await storage.bucket(bucketName).upload(filetobeuploded, {
+                   gzip: true,
                 
-                // image: { 
-                //     data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)), 
-                //     contentType: 'image/png'
-                // }  
-            
-            // console.log("this is object ",obj);
-            User.findByIdAndUpdate(id, { name: name , price:price,brand:brand,image:image,title:title,description:description}, 
-                function (err, docs) { 
-                    if (err){ 
-                        console.log(err) 
-                    }  
-                    else{ 
-                        req.flash(
-                            'success_msg',
-                            'Updated Successfully'
-                          );
-                        res.redirect('/products/1');
-                        console.log("Updated User"); 
-                    } 
-                });
-            
-            
+                 metadata: {
+                    firebaseStorageDownloadTokens: uuid,
+                    cacheControl: 'public, max-age=31536000',
+                },
+               
+             }).then((data) => {
+             
+                let file = data[0];
+                 
+                // return Promise.resolve("https://firebasestorage.googleapis.com/v0/b/" + bucketName + "/o/" + encodeURIComponent(req.file.name) + "?alt=media&token=" + uuid);
+                console.log("https://firebasestorage.googleapis.com/v0/b/" + "fir-crud-restapi-ac1a1.appspot.com" + "/o/" + encodeURIComponent(file.name) + "?alt=media&token=" + uuid)
+                hostedimage = "https://firebasestorage.googleapis.com/v0/b/" + "fir-crud-restapi-ac1a1.appspot.com" + "/o/" + encodeURIComponent(file.name) + "?alt=media&token=" + uuid;
+                 
+                  let  name = req.body.name
+                  let  price = req.body.price 
+                  let  brand = req.body.brand
+                  let  image = hostedimage
+                  let  title = req.body.title
+                  let  description=req.body.description
+                  let id = req.body.id;
+                    
+                    // image: { 
+                    //     data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)), 
+                    //     contentType: 'image/png'
+                    // }  
+                
+                // console.log("this is object ",obj);
+                User.findByIdAndUpdate(id, { name: name , price:price,brand:brand,image:image,title:title,description:description}, 
+                    function (err, docs) { 
+                        if (err){ 
+                            console.log(err) 
+                        }  
+                        else{ 
+                            req.flash(
+                                'success_msg',
+                                'Updated Successfully'
+                              );
+                            res.redirect('/products/1');
+                            console.log("Updated User"); 
+                        } 
+                    });
+                
+                
+    
+            });
+    
+            //  console.log(`${filetobeuploded} uploaded to ${bucketName}.`);
+            //  return res.status(200);
+    
+               
+            }
+            catch (error) {
+               console.log("mine debug=>",error.stack);
+               return res.status(500).send(error)
+            }
+      
+         })();
+    }
+    else{
+                 let  name = req.body.name
+                  let  price = req.body.price 
+                  let  brand = req.body.brand
+                  let  title = req.body.title
+                  let  description=req.body.description
+                  let id = req.body.id;
+                    
+                    // image: { 
+                    //     data: fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename)), 
+                    //     contentType: 'image/png'
+                    // }  
+                
+                // console.log("this is object ",obj);
+                User.findByIdAndUpdate(id, { name: name , price:price,brand:brand,title:title,description:description}, 
+                    function (err, docs) { 
+                        if (err){ 
+                            console.log(err) 
+                        }  
+                        else{ 
+                            req.flash(
+                                'success_msg',
+                                'Updated Successfully'
+                              );
+                            res.redirect('/products/1');
+                            console.log("Updated User"); 
+                        } 
+                    });
+    }
 
-        });
 
-        //  console.log(`${filetobeuploded} uploaded to ${bucketName}.`);
-        //  return res.status(200);
-
-           
-        }
-        catch (error) {
-           console.log("mine debug=>",error.stack);
-           return res.status(500).send(error)
-        }
-  
-     })();
+   
+    
 
 // User.findByIdAndUpdate(id, { name: name , price:price,brand:brand,image:image}, 
 // function (err, docs) { 
@@ -250,6 +296,7 @@ app.get('/alldetails',(req,res)=>{
     // })
   
 });
+
 
 
 app.post("/search",(req,res)=>{
@@ -591,6 +638,7 @@ app.get("/:id", async (req, res) => {
 	}
 });
 
+
 //Delete a fav item
 app.delete("/:id/:objId", async (req, res) => {
 	try {
@@ -613,6 +661,7 @@ app.delete("/:id/:objId", async (req, res) => {
 	}
 });
 
+//  cart post route for product 1
 app.post("/new/api/for/:id", async (req, res) => {
 	// res.send("working");
 	try {
@@ -647,7 +696,7 @@ app.post("/new/api/for/:id", async (req, res) => {
 				title: item.title,
 				description: item.description,
 			});
-			//Save it
+			//Save it 
 			const savedItem = await cartItem.save();
 
 			res.status(200).json({
@@ -661,6 +710,54 @@ app.post("/new/api/for/:id", async (req, res) => {
 	}
 });
 
+//  cart post route for product 1 
+app.post("/new/api/for/product2/:id", async (req, res) => {
+	// res.send("working");
+	try {
+        //Pulling out the item form the db
+        console.log("prams id",req.params.id);
+        const item = await User2.findById(req.params.id);
+        console.log("item id",item._id);
+		//Check if it exists in Cart item
+		const cartExists = await Cart.findOne({ objId: req.params.id });
+		console.log(cartExists, "cartExists");
+		//If it  exist in Cart db
+		if (cartExists) {
+			console.log("item in cart Exists");
+			//If it exists in cart db then make the flag false
+			const increaseQuantity = await User2.findByIdAndUpdate(
+				req.params.id,
+				{
+					item: item + 1,
+				},
+				{ new: true }
+			);
+			res.status(200).json(increaseQuantity);
+		} else {
+			// Collect the things you need
+			const cartItem = new Cart({
+				// / Ravi Put down your created proparties /
+              
+                price:item.price,
+                brand:item.brand,
+                image: item.image,
+				objId: item._id,
+				title: item.title,
+				description: item.description,
+			});
+			//Save it 
+			const savedItem = await cartItem.save();
+
+			res.status(200).json({
+				savedItem,
+			});
+		}
+	} catch (error) {
+		res.status(400).json({ msg: "something went wrong", err: error });
+
+		console.log(error.stack);
+	}
+});
 
 ///get all cart items
 app.get("/new/api/getdetails", async (req, res) => {
@@ -671,7 +768,7 @@ app.get("/new/api/getdetails", async (req, res) => {
 		res.status(400).json(err);
 	}
 });
-
+//delete from cart
 app.delete("/new/api/delete/:id", async (req, res) => {
 	try {
 		const item = await Cart.findByIdAndDelete(req.params.id);
@@ -735,7 +832,7 @@ app.get('/second/delete/:id',(req,res)=>{
         else{
             req.flash(
                 'success_msg',
-                'Deleted Successfully'
+                'Product Deleted Successfully'
               );
             res.redirect('/second/1');
             console.log('deleted');
