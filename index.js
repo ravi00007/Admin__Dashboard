@@ -565,11 +565,12 @@ app.get('/api/alldetails',(req,res)=>{
 
 
 // Post request which will handle db of Fav list
-app.post("/:id", async (req, res) => {
+app.post("/:id/:list", async (req, res) => {
 	// res.send("working");
 
 	try {
-		//Pulling out the item form the db
+        if(req.params.list == '1'){
+           //Pulling out the item form the db
 		const item = await User.findById(req.params.id);
 		//Check if it exists in fav item
 		const favExists = await Favorite.findOne({ objId: req.params.id });
@@ -612,6 +613,53 @@ app.post("/:id", async (req, res) => {
 				updateFlag,
 			});
 		}
+        }
+        else{
+            //Pulling out the item form the db
+		const item = await User.findById(req.params.id);
+		//Check if it exists in fav item
+		const favExists = await Favorite.findOne({ objId: req.params.id });
+		console.log(favExists, "favExists");
+		//If it  exist in fav db
+		if (favExists) {
+			console.log("favExists");
+			//If it exists in fav db then make the flag false
+			const unFavorite = await User2.findByIdAndUpdate(
+				req.params.id,
+				{
+					favorite: false,
+				},
+				{ new: true }
+			);
+			//Delete from favlist
+			var DeletedItem =await Favorite.findOneAndDelete({ objId: req.params.id });
+			res.status(200).json({
+				DeletedItem
+			});
+		} else {
+			// Collect the things you need
+			const favorite = new Favorite({
+				image: item.image,
+				objId: item._id,
+				title: item.title,
+				description: item.description,
+			});
+			//Save it
+			await favorite.save();
+			//Rase a flag that it is true
+			const updateFlag = await User2.findByIdAndUpdate(
+				req.params.id,
+				{
+					favorite: true,
+				},
+				{ new: true }
+			);
+			res.status(200).json({
+				updateFlag,
+			});
+		}
+        }
+		
 	} catch (error) {
 		res.status(400).json({ msg: "something went wrong", err: error.message });
 
@@ -716,6 +764,7 @@ app.post("/new/api/for/product2/:id/:list", async (req, res) => {
     
 	try {
         if(req.params.list == '1'){
+
             console.log("prams id",req.params.id);
             const item = await User.findById(req.params.id);
             console.log("item id",item._id);
