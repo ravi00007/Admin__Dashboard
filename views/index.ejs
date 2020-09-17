@@ -106,6 +106,33 @@
               </li>
             </ul> -->
           </li>
+          <li class="nav-item has-treeview menu-open">
+            <a href='/sec/forajx' class="nav-link">
+              <i class="nav-icon fas fa-table"></i>
+              <p>
+                Product List I
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+           
+          </li>
+          <li class="nav-item has-treeview menu-open">
+            <a href='/sec/forajxprdct2' class="nav-link">
+              <i class="nav-icon fas fa-table"></i>
+              <p>
+                Product List II
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <!-- <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href='/sec/forajxprdct2' class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>DataTables-2</p>
+                </a>
+              </li> -->
+            </ul>
+          </li>
           <li class="nav-item has-treeview">
            
             <ul class="nav nav-treeview">
@@ -149,7 +176,7 @@
           
             <div class="small-box bg-info">
               <div class="inner">
-                <h3><%=items%></h3>
+                <h3><%=items1%></h3>
 
                 <p>New Products</p>
               </div>
@@ -164,31 +191,33 @@
             <!-- small box -->
             <div class="small-box bg-success">
               <div class="inner">
-                <h3><%=items%></h3>
+                <h3><%=items1%></h3>
 
-                <p>View All Proudcts</p>
+                <p>View All Proudcts - I</p>
               </div>
               <div class="icon">
                 <i class="ion ion-stats-bars"></i>
               </div>
-              <a href="/products/1" class="small-box-footer">View <i class="fas fa-arrow-circle-right"></i></a>
+              <!-- href="/products/1" route for hard coad table-->
+              <a href="/sec/forajx" class="small-box-footer">View <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3><%=items2%></h3>
+
+                <p>View All Proudcts - II</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-stats-bars"></i>
+              </div>
+              <a href="sec/forajxprdct2" class="small-box-footer">View <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           <!-- ./col -->
-          <!-- <div class="col-lg-3 col-6">
-           
-            <div class="small-box bg-warning">
-              <div class="inner">
-                <h3><%=counter%></h3>
-
-                <p>Edited Proudcts</p>
-              </div>
-              <div class="icon">
-                <i class="ion ion-person-add"></i>
-              </div>
-              <a  class="small-box-footer">Edit <i class="fas fa-arrow-circle-right"></i></a>
-            </div>
-          </div> -->
+         
           <!-- ./col -->
           <!-- <div class="col-lg-3 col-6">
         

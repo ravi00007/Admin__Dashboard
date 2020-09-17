@@ -18,21 +18,41 @@
   <link rel="stylesheet" href="plugins/jqvmap/jqvmap.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
+
   <!-- overlayScrollbars -->
   <link rel="stylesheet" href="plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
   <!-- Daterange picker -->
   <link rel="stylesheet" href="plugins/daterangepicker/daterangepicker.css">
   <!-- summernote -->
+   <!-- Datatable CSS -->
+   <link href='/dist/DataTables/datatables.min.css' rel='stylesheet' type='text/css'>
+
+   <!-- jQuery Library -->
+   <!-- <script src="jquery-3.3.1.min.js"></script> -->
+   <script src="/dist/DataTables/jquery-3.3.1.min.js"></script>
+   <script src="/dist/DataTables/DataTables-1.10.18/js/dataTables.jqueryui.min.js"></script>
+   <script src="/dist/DataTables/DataTables-1.10.18/js/dataTables.jqueryui.js"></script>
+   <!-- Datatable JS -->
+   <script src="/dist/DataTables/datatables.min.js"></script>
   <link rel="stylesheet" href="plugins/summernote/summernote-bs4.css">
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <!-- Datatable CSS -->
+<link href='//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css' rel='stylesheet' type='text/css'>
+
+<!-- jQuery Library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Datatable JS -->
+<script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
-  
 
   <!-- Navbar -->
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -47,18 +67,12 @@
       </li> -->
       
       </li>
-      <% if (viewall) { %>
-        <li class="nav-item d-none d-sm-inline-block mt-3"">
-          <p><a href="/products/1" class="btn btn-success"  role="button">View All</a></p>
-          </li>
-        <% } else { %>
-              
-       <% } %>
+    
       
     </ul>
 
     <!-- SEARCH FORM -->
-    <form autocomplete="on" class="form-inline ml-3" action="/search2" method="POST">
+    <!-- <form autocomplete="on" class="form-inline ml-3" action="/search" method="POST">
       <div class=" input-group input-group-sm">
         <input id="searchName" name="searchkey" class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
         <div class="input-group-append">
@@ -67,7 +81,7 @@
           </button>
         </div>
       </div>
-    </form>
+    </form> -->
     
     <% if(success_msg!=''){ %>
       <div id="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -83,7 +97,7 @@
     <ul class="navbar-nav ml-auto">
       <!-- Messages Dropdown Menu -->
       <li class="nav-item dropdown">
-        <p><a href="/creatupdated2" class="btn btn-success"  role="button">Add Product</a></p>
+        <p><a href="/addforajxpro2" class="btn btn-success"  role="button">Add Product</a></p>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
           <a href="#" class="dropdown-item">
             <!-- Message Start -->
@@ -199,7 +213,7 @@
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
                <li class="nav-item has-treeview menu-open">
-                <a href="/dashbord" class="nav-link active">
+                <a href="/dashbord" class="nav-link">
                   <i class="nav-icon fas fa-tachometer-alt"></i>
                   <p>
                     Dashboard
@@ -215,44 +229,27 @@
                   </li>
                 </ul> -->
               </li>
-              <li class="nav-item has-treeview menu-open">
-                <a href="#" class="nav-link active">
-                  <i class="nav-icon fas fa-table"></i>
-                  <p>
-                    Table-1
-                    <i class="fas fa-angle-left right"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
+              <%- include('partials/forproduct2'); %>
+                <!-- <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="/products/1" class="nav-link">
+                    <a href='/sec/forajxprdct2' class="nav-link">
                       <i class="far fa-circle nav-icon"></i>
-                      <p>DataTables-1</p>
+                      <p>DataTables-2</p>
                     </a>
-                  </li>
+                  </li> -->
                 </ul>
               </li>
+              
           <li class="nav-item has-treeview menu-open">
           </li>
-          <li class="nav-item has-treeview">
-            
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="pages/tables/data.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>DataTables</p>
-                </a>
-              </li>
-             
-            </ul>
-          </li>
+          
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
     </div>
     <!-- /.sidebar -->
   </aside>
-
+ 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -271,81 +268,27 @@
         </div>
       </div>
     </div>
-
-    <!-- Main content -->
-    <section class="content">
-      <div class="container-fluid">
-        <% if(details!=null) { %>
-        <table  class="table table-bordered">
+     
+    <div >
+        <!-- Table -->
+        <table id='empTable' class='display dataTable'>
             <thead>
-              <tr>
-                <th >Name</th>
-                <th >Price</th>
-                <th >Brand</th>
-                <th >Image</th>
-                <th colspan="2">Action</th>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Brand</th>
+                <th>Image</th>
                 <th>Status</th>
-              </tr>  
-            </thead>
-            <tbody>
-              <% details.forEach(function(item){ %>
-              <tr>   
-                <td><%= item.name %></td>
-                <td><%= item.price %></td>
-                <td><%= item.brand %></td>
-                <td><img src="<%= item.image %>" style="width: 45px; height: 35px;"></td>
-                <td><p><a href="delete/<%= item.id %>" class="btn btn-danger" onclick="return confirm('Are you sure want to Delete');" role="button">Delete</a></p></td>
-                <td><p><a href="/sec/<%= item.id %>" class="btn btn-warning"  role="button">Edit</a></p></td>
+                <th>Action</th>
+                <th>Update</th>
                 
-                <% if (item.isactive) { %>
-                  <td><p><a href="/isactivatesecond/<%= item.id %>" class="btn btn-info" onclick="return confirm('Are you sure want to Deactivate');"  role="button">Active</a></p></td>
-              <% } else { %>
-                <td><p><a href="/isactivatesecond/<%= item.id %>" class="btn btn-danger" onclick="return confirm('Are you sure want to Activate');"  role="button">Inative</a></p></td>
-              <% } %>
-              </tr>
-            </tbody>
-            <% }) %>
-          </table>
-          <% } %>
-        <div class="row">
-          <!-- Left col -->
-      
-          </section>
-          <!-- /.Left col -->
-          <!-- right col (We are only adding the ID to make the widgets sortable)-->
-          <!-- <section class="col-lg-5 connectedSortable"> -->
-          <nav aria-label="Page navigation example">
-            <% if (pages > 0) { %>
-              <div class="text-xs-center" style="padding-left: 26%; margin-bottom: 5%;">
-              <ul class="pagination">
-                  <% if (current == 1) { %>
-                      <li class=" page-item disabled"><a class="page-link">First</a></li>
-                  <% } else { %>
-                      <li class="page-item"><a class="page-link" href="/products/1">First</a></li>
-                  <% } %>
-                  <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %>
-                  <% if (i !== 1) { %>
-                      <li class="page-item disabled"><a class="page-link">...</a></li>
-                  <% } %>
-                  <% for (; i <= (Number(current) + 4) && i <= pages; i++) { %>
-                      <% if (i == current) { %>
-                          <li class="page-item active"><a class="page-link"><%= i %></a></li>
-                      <% } else { %>
-                          <li class="page-item"><a class="page-link" href="/products/<%= i %>"><%= i %></a></li>
-                      <% } %>
-                      <% if (i == Number(current) + 4 && i < pages) { %>
-                          <li class=" page-item disabled"><a class="page-item">...</a></li>
-                      <% } %>
-                  <% } %>
-                  <% if (current == pages) { %>
-                      <li class="page-item disabled"><a class="page-link">Last</a></li>
-                  <% } else { %>
-                      <li class="page-item"><a class="page-link" href="/products/<%= pages %>">Last</a></li>
-                  <% } %>
-              </ul>
-              </div>
-          <% } %>
-        </nav>
+            </tr>
+            </thead>
+            
+        </table>
+    </div>
+
+       
           </section>
           <!-- right col -->
         </div>
@@ -383,7 +326,7 @@ $(function(){
 $('#searchName').autocomplete({
   source: function(req,res){
     $.ajax({
-      url:"/autocomplete2",
+      url:"/autocomplete",
       dataType:"jsonp",
       type:"GET",
       data: req,
@@ -405,6 +348,29 @@ $('#searchName').autocomplete({
 });
 });
 </script>
+<script>
+    $(document).ready(function(){
+        console.log("under data table")
+        $('#empTable').DataTable({
+            'processing': true,
+            'serverSide': true,
+            'serverMethod': 'post',
+            'ajax': {
+                'url':'http://localhost:7000/api/alldetails/forajaxprdct2'
+            },
+            'columns': [
+                { data: 'name' },
+                { data: 'price' },
+                { data: 'brand' },
+                { data: 'image' },
+                { data: 'action' },
+                { data: 'delete' },
+                { data: 'update' },
+                
+            ]
+        });
+    });
+    </script>
 <!-- <script>
   function myFun() {
   var x = document.getElementById("myDIV");

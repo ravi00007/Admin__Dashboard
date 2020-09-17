@@ -260,7 +260,7 @@
                     </table>
                     <% } %>
                   <% details.forEach(function(item){ %>
-                <form action="/sec/update" method="POST" enctype="multipart/form-data">
+                <form action="/sec/update/2" method="POST" enctype="multipart/form-data">
                 
                   <div class="form-group">
                     <label for="name"> Product Name</label>
@@ -330,7 +330,7 @@
                       id="password2"
                       name="myfile"
                       class="form-control"
-                      required
+                      
                       value="<%= item.brand %>"
                       onchange="readURL(this);"
                     /> 
