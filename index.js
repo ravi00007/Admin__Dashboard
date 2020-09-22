@@ -107,9 +107,6 @@ app.get('/dashbord', async(req, res) => {
             deletedcounter: deletecounter
         });
 
-
-
-
 });
 app.get('/dash',(req,res)=>{
     res.redirect('/dashbord');
