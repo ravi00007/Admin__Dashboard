@@ -1,5 +1,4 @@
-i have hosted  project on heruko 
-
+Preview link 
 https://ad-min-app.herokuapp.com/dashbord
 
 # Admin__Dashboard
