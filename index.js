@@ -20,9 +20,9 @@ const { url } = require('inspector');
 const session = require('express-session');
 const flash = require('connect-flash');
 
+const url = "YOUR mongoDB URL"
 
-
-mongoose.connect('mongodb+srv://cron:9304@ravi@cluster0.zl5bd.mongodb.net/cron?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
     if (!err) {
         console.log("mongodb connection succeeded..")
     }
