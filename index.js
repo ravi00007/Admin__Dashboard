@@ -20,7 +20,7 @@ const { url } = require('inspector');
 const session = require('express-session');
 const flash = require('connect-flash');
 
-const url = "YOUR mongoDB URL"
+const url = "YOUR mongoDB URL" // or you can fetch form .env file
 
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
     if (!err) {
